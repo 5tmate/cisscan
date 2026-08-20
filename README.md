@@ -19,13 +19,13 @@ scanner/(我們自己的掃描器)     adapters/(來源格式 → 固定 json)  
 ## 使用
 
 ```bash
-uv run python cisscan.py --profile <profile>（可省略，走標準憑證鏈）                  # 一鍵：掃描 + 評估 + 報告
-uv run python cisscan.py --from-terraformer <dump目錄>        # 一鍵：吃現成 dump + 評估 + 報告
+uv run python cisscan.py --profile <profile>                 # 一鍵：掃描 + 評估 + 報告（--profile 可省略，走標準憑證鏈）
+uv run python cisscan.py --from-terraformer <dump目錄>    # 一鍵：吃現成 dump + 評估 + 報告
 
 opa test rules/          # 跑全部規則測試
 uv run pytest            # scanner、adapters、報告層測試
 
-uv run python -m scanner.aws_api --profile <profile>（可省略，走標準憑證鏈） -o out/resources.json   # 只掃描
+uv run python -m scanner.aws_api --profile <profile> -o out/resources.json   # 只掃描
 uv run python report.py out/resources.json                                   # 只評估
 ```
 
