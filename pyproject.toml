@@ -3,7 +3,9 @@ name = "cisscan"
 version = "0.1.0"
 description = "CIS AWS Foundations Benchmark v5.0.0 live-account scanner: collectors feed a Terraform-shaped resource JSON into OPA rego rules"
 requires-python = ">=3.12"
-dependencies = []
+dependencies = [
+    "boto3>=1.43.75",
+]
 
 [dependency-groups]
 dev = ["pytest", "ruff"]
