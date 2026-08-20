@@ -1,7 +1,7 @@
 from botocore.exceptions import ClientError
 
-from collectors.aws_api import (
-    attempt,
+from collectors.aws_api import attempt
+from collectors.aws_response import (
     map_bucket,
     map_db_cluster,
     map_db_instance,
