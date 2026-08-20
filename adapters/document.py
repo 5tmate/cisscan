@@ -21,6 +21,11 @@ def make_document(resources, declared_types, account_id=None, scanned_at=None):
     return {"meta": meta, "resources": resources}
 
 
+def timestamped_output(prefix):
+    stamp = datetime.now().astimezone().strftime("%Y%m%d-%H%M%S")
+    return Path("out") / f"{prefix}_{stamp}.json"
+
+
 def write_document(document, output):
     output = Path(output)
     output.parent.mkdir(parents=True, exist_ok=True)

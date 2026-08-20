@@ -5,7 +5,7 @@ from botocore.exceptions import NoCredentialsError, ProfileNotFound
 
 import report as reporting
 from adapters import terraformer
-from adapters.document import make_document, write_document
+from adapters.document import make_document, timestamped_output, write_document
 from scanner import aws_api
 
 
@@ -40,7 +40,7 @@ def main():
     parser.add_argument("--profile", help="AWS profile; default: the standard credential chain")
     parser.add_argument("--regions", help="comma separated, default: all enabled regions")
     parser.add_argument("--account")
-    parser.add_argument("-o", "--output", default="out/resources.json")
+    parser.add_argument("-o", "--output", help="default: out/resources_<timestamp>.json")
     parser.add_argument(
         "--from-terraformer",
         nargs="+",
@@ -52,7 +52,7 @@ def main():
     return run(
         profile=arguments.profile,
         regions=regions,
-        output=arguments.output,
+        output=arguments.output or timestamped_output("resources"),
         account=arguments.account,
         terraformer_dumps=arguments.from_terraformer,
     )

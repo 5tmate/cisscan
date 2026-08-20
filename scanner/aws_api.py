@@ -20,7 +20,7 @@ from adapters.aws_response import (
     map_trail,
     parse_credential_report,
 )
-from adapters.document import make_document, write_document
+from adapters.document import make_document, timestamped_output, write_document
 
 
 def attempt(declared, types, fn):
@@ -406,12 +406,12 @@ def main():
     parser.add_argument("--profile", help="AWS profile; default: the standard credential chain")
     parser.add_argument("--regions", help="comma separated, default: all enabled regions")
     parser.add_argument("--account")
-    parser.add_argument("-o", "--output", default="out/resources.json")
+    parser.add_argument("-o", "--output", help="default: out/resources_<timestamp>.json")
     arguments = parser.parse_args()
     regions = arguments.regions.split(",") if arguments.regions else None
     resources, declared = collect(arguments.profile, regions)
     document = make_document(resources, declared, account_id=arguments.account)
-    output = write_document(document, arguments.output)
+    output = write_document(document, arguments.output or timestamped_output("resources"))
     print(
         f"{output}: {len(document['resources'])} resources, "
         f"{len(document['meta']['collected_types'])} collected types, "
