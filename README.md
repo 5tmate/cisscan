@@ -12,7 +12,7 @@ collector(可抽換)                     核心
 ```
 
 - **規則層先行完成**:v5.0.0 全部 40 條控制的 rego 已就位(`rules/`)，包含需要 credential report 等帳號級資料的 14 條，collector 之後補上資料，規則直接生效。
-- **中間格式是合約**:`{"meta": {...}, "resources": [{"_type": "aws_...", ...}]}`，欄位採 Terraform schema 命名。詳見 `docs/CONTROLS.md` 的「輸入合約」。
+- **中間格式是合約**:`{"meta": {...}, "resources": [{"_type": "aws_...", ...}]}`，欄位採 Terraform schema 命名。詳見 `controls/README.md` 的「輸入合約」。
 - **collected_types 閘門**:「必須存在某資源」類控制只在 collector 宣告收集過該型別時才判，看不到的東西不報違規。
 
 ## 使用
