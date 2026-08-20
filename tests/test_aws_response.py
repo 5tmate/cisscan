@@ -1,7 +1,6 @@
 from botocore.exceptions import ClientError
 
-from collectors.aws_api import attempt
-from collectors.aws_response import (
+from adapters.aws_response import (
     map_bucket,
     map_db_cluster,
     map_db_instance,
@@ -13,6 +12,7 @@ from collectors.aws_response import (
     map_trail,
     parse_credential_report,
 )
+from scanner.aws_api import attempt
 
 
 def test_map_security_group_translates_rules():

@@ -5,7 +5,7 @@ import time
 import boto3
 from botocore.exceptions import ClientError
 
-from collectors.aws_response import (
+from adapters.aws_response import (
     iso,
     map_authorization_details,
     map_bucket,
@@ -20,7 +20,7 @@ from collectors.aws_response import (
     map_trail,
     parse_credential_report,
 )
-from collectors.document import make_document, write_document
+from adapters.document import make_document, write_document
 
 
 def attempt(declared, types, fn):

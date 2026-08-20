@@ -3,7 +3,7 @@ import json
 import re
 from pathlib import Path
 
-from collectors.document import make_document, write_document
+from adapters.document import make_document, write_document
 
 NUMERIC_KEYS = {"from_port", "to_port", "rule_no", "minimum_password_length", "password_reuse_prevention"}
 
