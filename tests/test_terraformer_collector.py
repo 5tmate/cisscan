@@ -2,7 +2,7 @@ import json
 
 import pytest
 
-from transform import build_document, load_state, unflatten
+from collectors.terraformer import build_document, load_state, unflatten
 
 FIXTURE_STATE = {
     "version": 1,

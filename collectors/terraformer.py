@@ -1,8 +1,9 @@
 import argparse
 import json
 import re
-from datetime import UTC, datetime
 from pathlib import Path
+
+from collectors.document import make_document, write_document
 
 NUMERIC_KEYS = {"from_port", "to_port", "rule_no", "minimum_password_length", "password_reuse_prevention"}
 
@@ -19,8 +20,6 @@ SERVICE_DECLARES = {
     ],
     "s3": ["aws_s3_bucket", "aws_s3_bucket_policy"],
 }
-
-ACCOUNT_PATTERN = re.compile(r"arn:aws[^:]*:[^:]*:[^:]*:(\d{12}):")
 
 
 def typed(key, value):
@@ -103,9 +102,9 @@ def load_state(path):
     return resources
 
 
-def build_document(roots, account_id=None, scanned_at=None):
+def collect(roots):
     resources = []
-    services = set()
+    declared = set()
     for root in roots:
         root = Path(root)
         for state in sorted(root.rglob("terraform.tfstate")):
@@ -118,20 +117,14 @@ def build_document(roots, account_id=None, scanned_at=None):
             if region:
                 for resource in loaded:
                     resource["_region"] = region
-            services.add(service)
+            declared.update(SERVICE_DECLARES.get(service, []))
             resources.extend(loaded)
-    collected = {r["_type"] for r in resources}
-    for service in services:
-        collected.update(SERVICE_DECLARES.get(service, []))
-    if account_id is None:
-        match = ACCOUNT_PATTERN.search(json.dumps(resources))
-        account_id = match.group(1) if match else "unknown"
-    meta = {
-        "account_id": account_id,
-        "scanned_at": scanned_at or datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ"),
-        "collected_types": sorted(collected),
-    }
-    return {"meta": meta, "resources": resources}
+    return resources, declared
+
+
+def build_document(roots, account_id=None, scanned_at=None):
+    resources, declared = collect(roots)
+    return make_document(resources, declared, account_id, scanned_at)
 
 
 def main():
@@ -143,9 +136,7 @@ def main():
     parser.add_argument("--account")
     arguments = parser.parse_args()
     document = build_document(arguments.dumps, account_id=arguments.account)
-    output = Path(arguments.output)
-    output.parent.mkdir(parents=True, exist_ok=True)
-    output.write_text(json.dumps(document, indent=1))
+    output = write_document(document, arguments.output)
     print(
         f"{output}: {len(document['resources'])} resources, "
         f"{len(document['meta']['collected_types'])} collected types, "

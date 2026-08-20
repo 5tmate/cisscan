@@ -5,10 +5,11 @@
 ## 架構
 
 ```
-collector(可抽換)                     核心
-┌ terraformer dump(現況)┐
-│ boto3 API collector(P2)├──→ resources.json ──→ opa eval(rules/)──→ 報告
-└ …                      ┘      (中間格式)
+collectors/(一個資料來源一個模組)          核心
+┌ terraformer.py(現況)      ┐
+│ aws_api.py(P2，boto3 自建)├──→ resources.json ──→ report.py(opa eval rules/)──→ 報告
+│ pulumi.py(未來，吃 state) │      (中間格式)
+└ document.py(共用組件)     ┘
 ```
 
 - **規則層先行完成**:v5.0.0 全部 40 條控制的 rego 已就位(`rules/`)，包含需要 credential report 等帳號級資料的 14 條，collector 之後補上資料，規則直接生效。
@@ -19,7 +20,13 @@ collector(可抽換)                     核心
 
 ```bash
 opa test rules/          # 跑全部規則測試(119 個)
+uv run pytest            # collector 與報告層測試
+
+uv run python -m collectors.terraformer <dump目錄> -o out/resources.json
+uv run python report.py out/resources.json
 ```
+
+collector 合約：每個 `collectors/<framework>.py` 負責把該來源的資料整形成中間格式（欄位翻成 Terraform 命名、型別正確、`collected_types` 誠實申報），共用的組文件與輸出邏輯在 `collectors/document.py`。新資料來源＝新增一個模組，規則層零修改。
 
 規則包合約:每個 package 輸出 `titles` / `cis_requirements` / `severities` / `enforced` / `applicable` / `deny`，報告層據此區分 pass / FAIL / n/a。
 
