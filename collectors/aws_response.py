@@ -30,7 +30,7 @@ def map_security_group(sg):
 
     return {
         "_type": "aws_security_group",
-        "_name": sg.get("GroupName", sg.get("GroupId", "")),
+        "_name": f"{sg.get('GroupName', '')}_{sg.get('GroupId', '')}".strip("_"),
         "id": sg.get("GroupId", ""),
         "name": sg.get("GroupName", ""),
         "ingress": rules(sg.get("IpPermissions", [])),
@@ -66,9 +66,11 @@ def map_network_acl(acl):
 
 def map_instance(instance):
     options = instance.get("MetadataOptions", {})
+    instance_id = instance.get("InstanceId", "")
+    tag = tag_name(instance.get("Tags"), "")
     return {
         "_type": "aws_instance",
-        "_name": tag_name(instance.get("Tags"), instance.get("InstanceId", "")),
+        "_name": f"{tag}_{instance_id}".strip("_"),
         "id": instance.get("InstanceId", ""),
         "metadata_options": [
             {

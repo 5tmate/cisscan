@@ -34,6 +34,7 @@ def test_map_security_group_translates_rules():
         }
     )
     assert resource["_type"] == "aws_security_group"
+    assert resource["_name"] == "bastion_sg-1"
     assert resource["name"] == "bastion"
     assert resource["ingress"][0] == {
         "protocol": "tcp",
@@ -81,7 +82,7 @@ def test_map_instance_reads_metadata_options_and_name_tag():
         }
     )
     assert resource["_type"] == "aws_instance"
-    assert resource["_name"] == "web-1"
+    assert resource["_name"] == "web-1_i-1"
     assert resource["metadata_options"] == [{"http_tokens": "required", "http_endpoint": "enabled"}]
 
 
