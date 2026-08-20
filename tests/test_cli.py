@@ -58,3 +58,15 @@ def test_scan_pipeline_from_terraformer_dump(tmp_path, monkeypatch, capsys):
     assert code == 0
     printed = capsys.readouterr().out
     assert "EC2.53" in printed
+
+
+def test_scan_reports_friendly_error_without_credentials(tmp_path, monkeypatch, capsys):
+    from botocore.exceptions import NoCredentialsError
+
+    def boom(profile, regions):
+        raise NoCredentialsError()
+
+    monkeypatch.setattr(cisscan.aws_api, "collect", boom)
+    code = cisscan.run(profile=None, regions=None, output=tmp_path / "r.json")
+    assert code == 2
+    assert "credential" in capsys.readouterr().err.lower()

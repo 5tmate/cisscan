@@ -394,7 +394,7 @@ def collect(profile, regions=None):
 
 def main():
     parser = argparse.ArgumentParser(description="Collect CIS-relevant resources directly from AWS APIs")
-    parser.add_argument("--profile", default="pulumi")
+    parser.add_argument("--profile", help="AWS profile; default: the standard credential chain")
     parser.add_argument("--regions", help="comma separated, default: all enabled regions")
     parser.add_argument("--account")
     parser.add_argument("-o", "--output", default="out/resources.json")

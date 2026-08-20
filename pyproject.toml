@@ -5,6 +5,7 @@ description = "CIS AWS Foundations Benchmark v5.0.0 live-account scanner: collec
 requires-python = ">=3.12"
 dependencies = [
     "boto3>=1.43.75",
+    "botocore[crt]>=1.43.75",
 ]
 
 [dependency-groups]

@@ -1,6 +1,8 @@
 import argparse
 import sys
 
+from botocore.exceptions import NoCredentialsError, ProfileNotFound
+
 import report as reporting
 from adapters import terraformer
 from adapters.document import make_document, write_document
@@ -11,7 +13,14 @@ def run(profile, regions, output, account=None, terraformer_dumps=None):
     if terraformer_dumps:
         document = terraformer.build_document(terraformer_dumps, account_id=account)
     else:
-        resources, declared = aws_api.collect(profile, regions)
+        try:
+            resources, declared = aws_api.collect(profile, regions)
+        except (NoCredentialsError, ProfileNotFound) as error:
+            print(
+                f"cisscan: no usable AWS credentials ({error}); pass --profile or set AWS_PROFILE",
+                file=sys.stderr,
+            )
+            return 2
         document = make_document(resources, declared, account_id=account)
     path = write_document(document, output)
     code, result = reporting.run(path)
@@ -24,7 +33,7 @@ def main():
     parser = argparse.ArgumentParser(
         description="Scan the AWS account and evaluate CIS AWS Foundations Benchmark v5.0.0 in one run"
     )
-    parser.add_argument("--profile", default="pulumi")
+    parser.add_argument("--profile", help="AWS profile; default: the standard credential chain")
     parser.add_argument("--regions", help="comma separated, default: all enabled regions")
     parser.add_argument("--account")
     parser.add_argument("-o", "--output", default="out/resources.json")
