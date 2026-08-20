@@ -25,9 +25,9 @@ opa test rules/          # 跑全部規則測試(119 個)
 
 ## 文件
 
-- `docs/CONTROLS.md`：40 條控制逐條對照:AWS 原文判定、我們的實作、資料來源、差異與理由
-- `docs/securityhub_definitions.json`：Security Hub API 的權威控制定義(severity、描述)
-- `docs/ec2-controls.txt`：EC2 控制頁完整原文存檔
+- `controls/README.md`：共用規格:依據來源、輸入合約、規則包合約、資料來源總表
+- `controls/<控制ID>.md`：每條規則一份說明:AWS 原文判定、我們的實作、資料來源、差異與理由
+- `docs/`：本地參考資料(AWS 原文存檔、Security Hub API 定義)，不進版控
 
 ## Roadmap
 
