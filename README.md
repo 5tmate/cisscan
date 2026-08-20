@@ -19,12 +19,14 @@ scanner/(我們自己的掃描器)     adapters/(來源格式 → 固定 json)  
 ## 使用
 
 ```bash
-opa test rules/          # 跑全部規則測試(119 個)
-uv run pytest            # collector 與報告層測試
+uv run python cisscan.py --profile <profile>                  # 一鍵：掃描 + 評估 + 報告
+uv run python cisscan.py --from-terraformer <dump目錄>        # 一鍵：吃現成 dump + 評估 + 報告
 
-uv run python -m scanner.aws_api --profile <profile> -o out/resources.json
-uv run python -m adapters.terraformer <dump目錄> -o out/resources.json
-uv run python report.py out/resources.json
+opa test rules/          # 跑全部規則測試
+uv run pytest            # scanner、adapters、報告層測試
+
+uv run python -m scanner.aws_api --profile <profile> -o out/resources.json   # 只掃描
+uv run python report.py out/resources.json                                   # 只評估
 ```
 
 職責劃分：`scanner/` 是我們自己的掃描器，只負責呼叫 AWS API；`adapters/` 是格式轉換層，每個模組把一種來源的資料整形成中間格式（欄位翻成 Terraform 命名、型別正確、`collected_types` 誠實申報），共用的組文件與輸出邏輯在 `adapters/document.py`。新資料來源＝新增一個 adapter，規則層零修改。
