@@ -215,3 +215,26 @@ def test_attempt_declares_on_success_and_skips_on_denial():
     result = attempt(declared, ["aws_flow_log"], denied)
     assert result is None
     assert "aws_flow_log" not in declared
+
+
+def test_collect_logs_progress(monkeypatch, capsys):
+    from scanner import aws_api
+
+    for name in ("collect_iam", "collect_s3", "collect_account_contact", "collect_region"):
+        monkeypatch.setattr(aws_api, name, lambda *a, **k: None)
+
+    class FakeEc2:
+        def describe_regions(self):
+            return {"Regions": [{"RegionName": "r1"}, {"RegionName": "r2"}]}
+
+    class FakeSession:
+        region_name = "r1"
+
+        def client(self, *a, **k):
+            return FakeEc2()
+
+    monkeypatch.setattr(aws_api.boto3, "Session", lambda profile_name=None: FakeSession())
+    aws_api.collect(None, None)
+    err = capsys.readouterr().err
+    assert "IAM" in err
+    assert "r2 (2/2)" in err

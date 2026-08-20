@@ -374,6 +374,10 @@ def collect_region(session, region, declared, resources):
     resources.extend(attempt(declared, ["aws_cloudtrail"], trails) or [])
 
 
+def log(message):
+    print(message, file=sys.stderr, flush=True)
+
+
 def collect(profile, regions=None):
     session = boto3.Session(profile_name=profile)
     if regions is None:
@@ -381,14 +385,19 @@ def collect(profile, regions=None):
         regions = [r["RegionName"] for r in ec2.describe_regions()["Regions"]]
     resources = []
     declared = set()
+    log("collecting IAM (global)...")
     collect_iam(session, declared, resources)
+    log("collecting S3 (global)...")
     collect_s3(session, declared, resources)
+    log("collecting account contact...")
     collect_account_contact(session, declared, resources)
-    for region in regions:
+    for index, region in enumerate(regions, 1):
+        log(f"scanning {region} ({index}/{len(regions)})...")
         start = len(resources)
         collect_region(session, region, declared, resources)
         for resource in resources[start:]:
             resource.setdefault("_region", region)
+    log(f"done: {len(resources)} resources")
     return resources, declared
 
 
