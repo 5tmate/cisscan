@@ -80,11 +80,11 @@ def control_sort_key(control):
     return (prefix, int(number))
 
 
-def render(report, meta):
+def render_text(report, meta):
     states = {"FAIL": 0, "pass": 0, "n/a": 0}
-    print(f"account {meta.get('account_id', '?')} — scanned {meta.get('scanned_at', '?')}")
+    lines = [f"account {meta.get('account_id', '?')} — scanned {meta.get('scanned_at', '?')}"]
     for package, entry in report.items():
-        print(f"\n{package}  {entry['title']}")
+        lines.append(f"\n{package}  {entry['title']}")
         for control in sorted(entry["controls"], key=control_sort_key):
             found = entry["controls"][control]
             gating = control in entry["enforced"]
@@ -99,11 +99,18 @@ def render(report, meta):
             else:
                 state = "n/a"
                 states["n/a"] += 1
-            print(f"  {control:14} {found['severity']:9} CIS {found['cis']:6} {state:18} {found['title']}")
+            lines.append(
+                f"  {control:14} {found['severity']:9} CIS {found['cis']:6} {state:18} {found['title']}"
+            )
             for message in sorted(found["deny"]):
-                print(f"      - {message}")
+                lines.append(f"      - {message}")
     total = sum(states.values())
-    print(f"\n{total} controls: {states['FAIL']} FAIL, {states['pass']} pass, {states['n/a']} n/a")
+    lines.append(f"\n{total} controls: {states['FAIL']} FAIL, {states['pass']} pass, {states['n/a']} n/a")
+    return "\n".join(lines)
+
+
+def render(report, meta):
+    print(render_text(report, meta))
 
 
 def main():

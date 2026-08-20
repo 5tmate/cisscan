@@ -25,7 +25,11 @@ def run(profile, regions, output, account=None, terraformer_dumps=None):
     path = write_document(document, output)
     code, result = reporting.run(path)
     if result:
-        reporting.render(result, document["meta"])
+        text = reporting.render_text(result, document["meta"])
+        print(text)
+        report_path = path.with_suffix(".report.txt")
+        report_path.write_text(text + "\n")
+        print(f"\nreport saved: {report_path}", file=sys.stderr)
     return code
 
 

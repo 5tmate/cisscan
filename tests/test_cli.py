@@ -27,6 +27,8 @@ def test_scan_pipeline_writes_document_and_reports(tmp_path, monkeypatch, capsys
     printed = capsys.readouterr().out
     assert "EC2.53" in printed
     assert "bastion_sg-1" in printed
+    saved = (tmp_path / "resources.report.txt").read_text()
+    assert "EC2.53" in saved
 
 
 def test_scan_pipeline_from_terraformer_dump(tmp_path, monkeypatch, capsys):
